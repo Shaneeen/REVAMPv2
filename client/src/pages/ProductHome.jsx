@@ -1,4 +1,3 @@
-// In ProductHome.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { Box, Typography, Button, Card, CardMedia, CardContent, CardActions, InputBase, IconButton, Grid } from '@mui/material';
 import { Search, Clear, ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
@@ -12,29 +11,31 @@ const ProductHome = () => {
   const [filteredCategories, setFilteredCategories] = useState([]);
   const categoryContainerRef = useRef(null);
 
+  const getCategories = () => {
+    http.get('/categories')
+      .then((res) => {
+        setCategories(res.data);
+        setFilteredCategories(res.data);
+      })
+      .catch(error => {
+        console.error('Error fetching categories:', error);
+      });
+  };
+
+  const getBestsellerProducts = () => {
+    http.get('/products?type=bestseller')
+      .then((res) => {
+        setProducts(res.data);
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
+      });
+  };
+
   useEffect(() => {
-    fetchCategories();
-    fetchBestsellerProducts();
+    getCategories();
+    getBestsellerProducts();
   }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await http.get('/categories');
-      setCategories(response.data);
-      setFilteredCategories(response.data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const fetchBestsellerProducts = async () => {
-    try {
-      const response = await http.get('/products?type=bestseller');
-      setProducts(response.data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -162,3 +163,5 @@ const ProductHome = () => {
 };
 
 export default ProductHome;
+
+

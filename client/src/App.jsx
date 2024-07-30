@@ -8,6 +8,7 @@ import EditCategory from './pages/EditCategory';
 import EditSubCategory from './pages/EditSubCategory';
 import ProductHome from './pages/ProductHome';
 import ProductDetails from './pages/ProductDetails';
+import Cart from './pages/Cart';
 
 import { ThemeProvider } from '@mui/material/styles';
 import MyTheme from './themes/MyTheme';
@@ -45,6 +46,9 @@ function App() {
                 <Button component={Link} to="/producthome" sx={{ color: 'white' }}>
                   ProductHome
                 </Button>
+                <Button component={Link} to="/cart" sx={{ color: 'white' }}>
+                  Cart
+                </Button>
               </Box>
             </Toolbar>
           </Container>
@@ -61,6 +65,7 @@ function App() {
             <Route path="/editsubcategory/:SubCategoryID" element={<EditSubCategory />} />
             <Route path="/producthome" element={<ProductHome />} />
             <Route path="/product/:ProductID" element={<ProductDetails />} />
+            <Route path="/cart" element={<Cart />} />
           </Routes>
         </Container>
       </ThemeProvider>

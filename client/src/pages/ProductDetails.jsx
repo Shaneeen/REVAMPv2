@@ -1,7 +1,6 @@
-// pages/ProductDetails.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, Button, Grid, Card, CardMedia, Select, MenuItem, FormControl, InputLabel, TextField, Stack } from '@mui/material';
+import { Box, Typography, Button, Grid, Card, CardMedia, Select, MenuItem, FormControl, InputLabel, TextField, Stack, CircularProgress, Alert } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import http from '../http';
 
@@ -10,17 +9,21 @@ function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await http.get(`/products/${ProductID}`);
+        console.log('Product fetched:', response.data);
         setProduct(response.data);
         if (response.data.Colors.length > 0) {
           setSelectedColor(response.data.Colors[0]);
         }
       } catch (error) {
         console.error('Error fetching product:', error);
+        setError('Failed to load product details.');
       }
     };
 
@@ -36,6 +39,40 @@ function ProductDetails() {
   const handleQuantityChange = (event) => {
     setQuantity(event.target.value);
   };
+
+  const handleAddToCart = async () => {
+    if (quantity < 1) {
+        alert('Quantity must be at least 1');
+        return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+        console.log('Adding to cart:', {
+            ProductID: product.ProductID,
+            ColorID: selectedColor.ColorID,
+            Quantity: quantity
+        });
+
+        const response = await http.post('/cart/add', {
+            ProductID: product.ProductID,
+            ColorID: selectedColor.ColorID,
+            Quantity: quantity
+        });
+
+        console.log('Add to cart response:', response.data);
+        alert('Item added to cart successfully');
+    } catch (error) {
+        console.error('Error adding item to cart:', error);
+        setError('Error adding item to cart. Please try again.');
+    } finally {
+        setLoading(false);
+    }
+};
+
+
 
   if (!product) {
     return <Typography>Loading...</Typography>;
@@ -111,10 +148,18 @@ function ProductDetails() {
                 color="primary" 
                 startIcon={<AddShoppingCartIcon />}
                 sx={{ flexGrow: 1 }}
+                onClick={handleAddToCart}
+                disabled={loading}
               >
-                Add to Cart
+                {loading ? <CircularProgress size={24} /> : 'Add to Cart'}
               </Button>
             </Stack>
+
+            {error && (
+              <Box sx={{ mt: 2 }}>
+                <Alert severity="error">{error}</Alert>
+              </Box>
+            )}
           </Box>
         </Grid>
       </Grid>
@@ -123,3 +168,7 @@ function ProductDetails() {
 }
 
 export default ProductDetails;
+
+
+
+
